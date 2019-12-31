@@ -30,11 +30,23 @@ def create_app(test_config=None):
 
         return response
 
-    '''
-    @TODO: 
-    Create an endpoint to handle GET requests 
-    for all available categories.
-    '''
+    @app.route('/categories')
+    def get_all_categories():
+        """Get categories endpoint
+
+        This endpoint returns all categories or 
+        status code 500 if there is a server error
+        """
+
+        try:
+            categories = Category.query.all()
+            return jsonify({
+                'success' : True,
+                'categories' : [category.format() for category in categories]
+            })
+        except Exception:
+            abort(500)
+
 
 
     '''
@@ -107,7 +119,24 @@ def create_app(test_config=None):
     Create error handlers for all expected errors 
     including 404 and 422. 
     '''
-    
+    # Error handler for resource not found (404)
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Resource not found'
+        }), 404
+
+    # Error handler for internal server error (500)
+    @app.errorhandler(500)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 500,
+            'message': 'An error has occured, please try again'
+        }), 500
+
     return app
 
     
