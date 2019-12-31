@@ -130,7 +130,7 @@ def create_app(test_config=None):
 
     # Error handler for internal server error (500)
     @app.errorhandler(500)
-    def not_found(error):
+    def internal_server_error(error):
         return jsonify({
             'success': False,
             'error': 500,
