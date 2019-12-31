@@ -43,7 +43,7 @@ def create_app(test_config=None):
             return jsonify({
                 'success' : True,
                 'categories' : [category.format() for category in categories]
-            })
+            }), 200
         except Exception:
             abort(500)
 
