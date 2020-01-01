@@ -36,22 +36,66 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
     def test_get_all_categories(self):
-      """Test for get_all_categories
+        """Test for get_all_categories
 
-      Tests for the status code, if success is true,
-      if categories is returned and the length of
-      the returned categories
-      """
+        Tests for the status code, if success is true,
+        if categories is returned and the length of
+        the returned categories
+        """
 
-      # make request and process response
-      response = self.client().get('/categories')
-      data = json.loads(response.data)
+        # make request and process response
+        response = self.client().get('/categories')
+        data = json.loads(response.data)
 
-      # make assertions on the response data
-      self.assertEqual(response.status_code, 200)
-      self.assertEqual(data['success'], True)
-      self.assertTrue(data['categories'])
-      self.assertEqual(len(data['categories']), 6)
+        # make assertions on the response data
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'])
+        self.assertEqual(len(data['categories']), 6)
+    
+    def test_get_paginated_questions(self):
+        """Test for get all paginated questions
+
+        This tests the return values for a successful
+        return of paginated questions
+
+        the assertion that ensures the paginated questions
+        is always 10, is determined by a constant that could
+        change.
+        """
+        # make request and process response
+        response = self.client().get('/questions')
+        data = json.loads(response.data)
+
+         # make assertions on the response data
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'])
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['questions'])
+        self.assertEqual(len(data['questions']), 10)
+
+    def test_error_for_out_of_bound_page(self):
+        """Test for out of bound page
+       
+        This test ensures a page that is out of bound 
+        returns a 404 error
+        """
+
+        # make request and process response
+        response = self.client().get('/questions?page=10000000')
+        data = json.loads(response.data)
+
+        # make assertions on the response data
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource not found')
+
+
+
+
+
+    
       
 
 
