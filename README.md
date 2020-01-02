@@ -118,10 +118,11 @@ The error codes currently returned are:
 
 #### GET /categories
 
-Returns a list categories.
-- Sample request: `curl http://127.0.0.1:5000/categories`
+- General: 
+  - Returns all the categories.
 
-- Sample response
+- Sample:  `curl http://127.0.0.1:5000/categories`
+
 ```json
     {
         "categories": {
@@ -137,11 +138,13 @@ Returns a list categories.
 ```
 
 #### GET /questions
+- General:
+  - Returns all questions
+  - questions are in a paginated.
+  - pages could be requested by a query string
 
-Returns all questions, in a paginated in groups of 10, and the categories.
-- Sample request: `curl http://127.0.0.1:5000/questions`<br>
+- Sample: `curl http://127.0.0.1:5000/questions`<br>
 
-- Sample response
 ```json
         {
     "categories": {
@@ -231,10 +234,12 @@ Returns all questions, in a paginated in groups of 10, and the categories.
 
 #### DELETE /questions/<int:id\>
 
-Deletes a question by id form the url parameter.
-- Sample request: `curl http://127.0.0.1:5000/questions/6 -X DELETE`
 
-- Sample response
+- General:
+  - Deletes a question by id form the url parameter.
+
+- Sample: `curl http://127.0.0.1:5000/questions/6 -X DELETE`
+
 ```json
         {
           "success": "True",
@@ -244,16 +249,16 @@ Deletes a question by id form the url parameter.
 
 #### POST /questions
 
-Creates a new question based on a payload.
+- General:
+  - Creates a new question based on a payload.
 
-- Sample request: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{
+- Sample: `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{
             "question": "Frankie Fredericks represented which African country in athletics?",
             "answer": "Namibia",
             "difficulty": 3,
             "category": "6"
         }'`
 
-- Sample response
 ```json
 {
   "message": "Question successfully created!",
@@ -263,9 +268,11 @@ Creates a new question based on a payload.
 
 #### POST /questions/search
 
-* Sample: `curl http://127.0.0.1:5000/questions/search -X POST -H "Content-Type: application/json" -d '{"searchTerm": "Anne Rice"}'`
+- General:
+  - returns questions that has the search substring
 
-- Sample response
+- Sample: `curl http://127.0.0.1:5000/questions/search -X POST -H "Content-Type: application/json" -d '{"searchTerm": "Anne Rice"}'`
+
 ```json
 {
   "questions": [
@@ -280,16 +287,14 @@ Creates a new question based on a payload.
   "success": true,
   "total_questions": 20
 }
-
 ```
 
 #### GET /categories/<int:id\>/questions
 
-Gets questions by category using the id from the url parameter.
+- General:
+  - Gets questions by category using the id from the url parameter.
+- Sample: `curl http://127.0.0.1:5000/categories/1/questions`<br>
 
-- Sample request: `curl http://127.0.0.1:5000/categories/1/questions`<br>
-
-- Sample response
 ```json
 {
   "current_category": "Science",
@@ -324,11 +329,13 @@ Gets questions by category using the id from the url parameter.
 
 #### POST /quizzes
 
-Takes the category and previous questions to return random question not in previous questions.
-- Sample request: `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions": [5, 9],
+- General
+  - Takes the category and previous questions in the request.
+  - Return random question not in previous questions.
+
+- Sample: `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions": [5, 9],
                                             "quiz_category": {"type": "History", "id": "4"}}'`
 
-- Sample response
 ```json
 {
   "question": {
