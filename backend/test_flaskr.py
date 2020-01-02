@@ -178,7 +178,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_create_question_with_empty_data(self):
         """Test for ensuring data with empty fields are not processed."""
-        payload = {
+        request_data = {
             'question': '',
             'answer': '',
             'difficulty': 1,
@@ -186,7 +186,7 @@ class TriviaTestCase(unittest.TestCase):
         }
 
         # make request and process response
-        response = self.client().post('/questions', json=payload)
+        response = self.client().post('/questions', json=request_data)
         data = json.loads(response.data)
 
         # Assertions
@@ -194,13 +194,53 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Unprocessable entity')
 
+    def test_search_questions(self):
+        """Test for searching for a question."""
 
+        request_data = {
+            'searchTerm': 'largest lake in Africa',
+        }
 
+        # make request and process response
+        response = self.client().post('/questions/search', json=request_data)
+        data = json.loads(response.data)
 
+        # Assertions
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 1)
 
+    def test_empty_search_term_response(self):
+        """Test for empty search term."""
 
-    
-      
+        request_data = {
+            'searchTerm': '',
+        }
+
+        # make request and process response
+        response = self.client().post('/questions/search', json=request_data)
+        data = json.loads(response.data)
+
+         # Assertions
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Unprocessable entity')
+
+    def test_search_term_not_found(self):
+        """Test for search term not found."""
+
+        request_data = {
+            'searchTerm': 'dfjdtrertwfresyg346474yg',
+        }
+
+        # make request and process response
+        response = self.client().post('/questions/search', json=request_data)
+        data = json.loads(response.data)
+
+         # Assertions
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource not found')
 
 
 # Make the tests conveniently executable

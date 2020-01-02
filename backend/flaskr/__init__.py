@@ -119,10 +119,6 @@ def create_app(test_config=None):
 
     '''
     @TODO: 
-    Create an endpoint to POST a new question, 
-    which will require the question and answer text, 
-    category, and difficulty score.
-
     TEST: When you submit a question on the "Add" tab, 
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.  
@@ -170,15 +166,43 @@ def create_app(test_config=None):
             abort(422)        
 
     '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
-
+    @TODO:
     TEST: Search by any phrase. The questions list will update to include 
     only question that include that string within their question. 
     Try using the word "title" to start. 
     '''
+    @app.route('/questions/search', methods=['POST'])
+    def search_questions():
+        """This endpoint returns questions from a search term. """
+
+        # Get search term from request data
+        data = request.get_json()
+        search_term = data.get('searchTerm', '')
+
+        # Return 422 status code if empty search term is sent
+        if search_term == '':
+            abort(422)
+
+        try:
+            # get all questions that has the search term substring
+            questions = Question.query.filter(
+                Question.question.ilike(f'%{search_term}%')).all()
+
+            # if there are no questions for search term return 404
+            if len(questions) == 0:
+                abort(404)
+
+            # return response if successful
+            return jsonify({
+                'success': True,
+                'questions': [question.format() for question in questions],
+                'total_questions': len(Question.query.all())
+            }), 200
+
+        except Exception:
+            # This error code is returned when 404 abort
+            # raises exception from try block
+            abort(404)
 
     '''
     @TODO: 
