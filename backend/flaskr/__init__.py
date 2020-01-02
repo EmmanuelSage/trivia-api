@@ -6,6 +6,8 @@ import random
 
 from models import setup_db, Question, Category
 
+from utils import get_paginated_questions
+
 QUESTIONS_PER_PAGE = 10
 
 def create_app(test_config=None):
@@ -40,9 +42,16 @@ def create_app(test_config=None):
 
         try:
             categories = Category.query.all()
+
+            # Format categories to match front-end
+            categories_dict = {}
+            for category in categories:
+                categories_dict[category.id] = category.type
+
+            # return successful response
             return jsonify({
                 'success' : True,
-                'categories' : [category.format() for category in categories]
+                'categories' : categories_dict
             }), 200
         except Exception:
             abort(500)
@@ -67,17 +76,15 @@ def create_app(test_config=None):
         QUESTIONS_PER_PAGE is a global variable
         """
 
-        # get query string page to determine pagination
-        page = request.args.get('page', 1, int)
-        start = (page - 1) * QUESTIONS_PER_PAGE
-        end = start + QUESTIONS_PER_PAGE
-
         # get paginated questions and categories
         questions = Question.query.order_by(Question.id).all()
-        questions = [question.format() for question in questions ]
         total_questions = len(questions)
         categories = Category.query.order_by(Category.id).all()
-        current_questions = questions[start:end]
+
+        # Get paginated questions
+        current_questions = get_paginated_questions(
+                                request, questions, 
+                                QUESTIONS_PER_PAGE)
 
         # return 404 if there are no questions for the page number
         if (len(current_questions) == 0):
@@ -167,7 +174,7 @@ def create_app(test_config=None):
 
         except Exception:
             # return 422 status code if error 
-            abort(422)        
+            abort(422)
 
     '''
     @TODO:
@@ -196,10 +203,15 @@ def create_app(test_config=None):
             if len(questions) == 0:
                 abort(404)
 
+            # paginate questions
+            paginated_questions = get_paginated_questions(
+                                request, questions, 
+                                QUESTIONS_PER_PAGE)
+
             # return response if successful
             return jsonify({
                 'success': True,
-                'questions': [question.format() for question in questions],
+                'questions': paginated_questions,
                 'total_questions': len(Question.query.all())
             }), 200
 
@@ -226,12 +238,16 @@ def create_app(test_config=None):
             abort(422)
 
         questions = Question.query.filter_by(category=id).all()
-        questions = [question.format() for question in questions]
+
+        # paginate questions
+        paginated_questions = get_paginated_questions(
+                            request, questions, 
+                            QUESTIONS_PER_PAGE)
 
         # return the results
         return jsonify({
             'success': True,
-            'questions': questions,
+            'questions': paginated_questions,
             'total_questions': len(questions),
             'current_category': category.type
         })
