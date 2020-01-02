@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flaskr import create_app
 from models import setup_db, Question, Category
 
+from utils import *
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -67,7 +68,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().get('/questions')
         data = json.loads(response.data)
 
-         # make assertions on the response data
+        # make assertions on the response data
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['categories'])
@@ -90,6 +91,71 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource not found')
+    
+    def test_successful_question_delete(self):
+        """Test for deleting a question.
+        
+        create_mock_question function is used to prevent having
+        to drop the database during the running of the test suite.
+        """
+
+        # create mock question and get id
+        mock_question_id = create_mock_question()
+
+        # delete mock question and process response
+        response = self.client().delete('/questions/{}'.format(mock_question_id))
+        data = json.loads(response.data)
+
+        # ensure question does not exist 
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['message'], "Question successfully deleted")
+
+    def test_delete_same_question_twice(self):
+        """unsuccessful deletion of question
+
+        This tests the error message returned when
+        you try to delete the same question twice.
+        """
+
+        mock_question_id = create_mock_question()
+
+        # this tests if resource has already been deleted
+        self.client().delete('/questions/{}'.format(mock_question_id))
+        response = self.client().delete('/questions/{}'.format(mock_question_id))
+        data = json.loads(response.data)
+
+        # make assertions on the response data
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Unprocessable entity')
+
+
+    def test_delete_question_id_not_exist(self):
+        """Tests deletion of question id that doesn't exist
+
+        This tests the error message returned a valid id that 
+        doesn't exist is used.
+        """
+        # this tests an id that doesn't exist
+        response = self.client().delete('/questions/1211256')
+        data = json.loads(response.data)
+
+        # make assertions on the response data
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Unprocessable entity')
+
+    def test_delete_question_with_invalid_id(self):
+        """Tests deletion of question with invalid id"""
+        # this tests an invalid id
+        response = self.client().delete('/questions/sadsa2112kjsds6')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource not found')
+    
 
 
 

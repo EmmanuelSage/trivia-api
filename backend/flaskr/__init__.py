@@ -95,11 +95,27 @@ def create_app(test_config=None):
 
     '''
     @TODO: 
-    Create an endpoint to DELETE question using a question ID. 
-
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page. 
     '''
+    @app.route('/questions/<int:id>', methods=['DELETE'])
+    def delete_question(id):
+        """Delete specific question
+
+        This endpoint deletes a specific question by the 
+        id given as a url parameter
+        """
+        try:
+            question = Question.query.get(id)
+            question.delete()
+
+            return jsonify({
+                'success': True,
+                'message': "Question successfully deleted"
+            }), 200
+        except Exception:
+            abort(422)
+
 
     '''
     @TODO: 
@@ -167,6 +183,15 @@ def create_app(test_config=None):
             'error': 500,
             'message': 'An error has occured, please try again'
         }), 500
+
+    # Error handler for unprocesable entity (422)
+    @app.errorhandler(422)
+    def unprocesable_entity(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'Unprocessable entity'
+        }), 422
 
     return app
 
