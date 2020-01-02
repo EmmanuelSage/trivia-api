@@ -127,6 +127,47 @@ def create_app(test_config=None):
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.  
     '''
+    @app.route('/questions', methods=['POST'])
+    def create_question():
+        """This endpoint creates a question.
+        
+        A 422 status code is returned if the any of
+        the json data is empty.
+        """
+        # Get json data from request
+        data = request.get_json()
+
+        # get individual data from json data
+        question = data.get('question','')
+        answer = data.get('answer','')
+        difficulty = data.get('difficulty','')
+        category = data.get('category','')
+
+        # validate to ensure no data is empty
+        if ((question == '') or (answer == '')
+                or (difficulty == '') or (category == '')):
+            abort(422)
+
+        try:
+            # Create a new question instance
+            question = Question(
+                question=question, 
+                answer=answer,
+                difficulty=difficulty, 
+                category=category)
+        
+            # save question
+            question.insert()
+
+            # return success message
+            return jsonify({
+                'success': True,
+                'message': 'Question successfully created!'
+            }), 201
+
+        except Exception:
+            # return 422 status code if error 
+            abort(422)        
 
     '''
     @TODO: 

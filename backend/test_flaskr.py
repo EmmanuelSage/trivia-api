@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flaskr import create_app
 from models import setup_db, Question, Category
 
-from utils import *
+from utils import create_mock_question
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -155,7 +155,45 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource not found')
-    
+
+    def test_create_questions(self):
+        """Test for creating question."""
+       
+       # mock data to use as payload for post request
+        mock_data = {
+            'question': 'This is a mock question',
+            'answer': 'this is a mock answer',
+            'difficulty': 1,
+            'category': 1,
+        }
+
+        # make request and process response
+        response = self.client().post('/questions', json=mock_data)
+        data = json.loads(response.data)
+
+        # asserions to ensure successful request
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['message'], 'Question successfully created!')
+
+    def test_create_question_with_empty_data(self):
+        """Test for ensuring data with empty fields are not processed."""
+        payload = {
+            'question': '',
+            'answer': '',
+            'difficulty': 1,
+            'category': 1,
+        }
+
+        # make request and process response
+        response = self.client().post('/questions', json=payload)
+        data = json.loads(response.data)
+
+        # Assertions
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Unprocessable entity')
+
 
 
 
