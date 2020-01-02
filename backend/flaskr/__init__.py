@@ -83,11 +83,15 @@ def create_app(test_config=None):
         if (len(current_questions) == 0):
             abort(404)
 
+        categories_dict = {}
+        for category in categories:
+            categories_dict[category.id] = category.type
+
         # return values if there are no errors
         return jsonify({
             'success': True,
             'total_questions': total_questions,
-            'categories': [category.format() for category in categories],
+            'categories': categories_dict,
             'questions': current_questions
         }), 200
 
