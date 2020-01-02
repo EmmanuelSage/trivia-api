@@ -100,7 +100,7 @@ Errors are returned in the following json format:
 
 ```json
       {
-        "success": False,
+        "success": "False",
         "error": 422,
         "message": "Unprocessable entity",
       }
@@ -229,7 +229,7 @@ Returns all questions, in a paginated in groups of 10, and the categories.
 }
 ```
 
-#### DELETE /questions/\<int:id\>
+#### DELETE /questions/<int:id\>
 
 Deletes a question by id form the url parameter.
 - Sample request: `curl http://127.0.0.1:5000/questions/6 -X DELETE`
@@ -237,7 +237,7 @@ Deletes a question by id form the url parameter.
 - Sample response
 ```json
         {
-          "success": True,
+          "success": "True",
           "message": "Question successfully deleted"
         }
 ```
@@ -283,7 +283,7 @@ Creates a new question based on a payload.
 
 ```
 
-#### GET /categories/\<int:id\>/questions
+#### GET /categories/<int:id\>/questions
 
 Gets questions by category using the id from the url parameter.
 
@@ -314,17 +314,10 @@ Gets questions by category using the id from the url parameter.
       "difficulty": 4,
       "id": 22,
       "question": "Hematology is a branch of medicine involving the study of what?"
-    },
-    {
-      "answer": "yeah",
-      "category": 1,
-      "difficulty": 1,
-      "id": 24,
-      "question": "is Helllll is real"
     }
   ],
   "success": true,
-  "total_questions": 4
+  "total_questions": 3
 }
 
 ```
