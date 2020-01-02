@@ -243,12 +243,62 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not. 
     '''
+    @app.route('/quizzes', methods=['POST'])
+    def play_quiz_question():
+        """This returns a random question to play quiz."""
+
+        # process the request data and get the values
+        data = request.get_json()
+        previous_questions = data.get('previous_questions')
+        quiz_category = data.get('quiz_category')
+
+        # return 404 if quiz_category or previous_questions is empty
+        if ((quiz_category is None) or (previous_questions is None)):
+            abort(400)
+
+        # if default value of category is given return all questions
+        # else return questions filtered by category
+        if (quiz_category['id'] == 0):
+            questions = Question.query.all()
+        else:
+            questions = Question.query.filter_by(category=quiz_category['id']).all()
+
+        # defines a random question generator method
+        def get_random_question():
+            return questions[random.randint(0, len(questions)-1)]
+
+        # get random question for the next question
+        next_question = get_random_question()
+
+        # defines boolean used to check that the question
+        # is not a previous question
+        found = True
+
+        while found:
+            if next_question.id in previous_questions:
+                next_question = get_random_question()
+            else:
+                found = False
+
+        return jsonify({
+            'success': True,
+            'question': next_question.format(),
+        }), 200
 
     '''
     @TODO: 
     Create error handlers for all expected errors 
     including 404 and 422. 
     '''
+    # Error handler for Bad request error (400)
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            'message': 'Bad request error'
+        }), 400
+
     # Error handler for resource not found (404)
     @app.errorhandler(404)
     def not_found(error):
