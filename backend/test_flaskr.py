@@ -242,6 +242,31 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource not found')
 
+    def test_get_questions_by_category(self):
+        """Test for getting questions by category."""
+
+        # make a request for the Sports category with id of 6
+        response = self.client().get('/categories/6/questions')
+        data = json.loads(response.data)
+
+        # Assertions
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertNotEqual(len(data['questions']), 0)
+        self.assertEqual(data['current_category'], 'Sports')
+
+    def test_invalid_category_id(self):
+        """Test for invalid category id"""
+
+        # request with invalid category id 1987
+        response = self.client().get('/categories/1987/questions')
+        data = json.loads(response.data)
+
+        # Assertions to ensure 422 error is returned
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Unprocessable entity')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
