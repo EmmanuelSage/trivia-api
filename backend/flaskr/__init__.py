@@ -10,6 +10,7 @@ from utils import get_paginated_questions
 
 QUESTIONS_PER_PAGE = 10
 
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -17,7 +18,7 @@ def create_app(test_config=None):
 
     # Set up CORS. Allow '*' for origins.
     CORS(app, resources={'/': {'origins': '*'}})
-    
+
     # Use the after_request decorator to set Access-Control-Allow
     @app.after_request
     def after_request(response):
@@ -32,12 +33,11 @@ def create_app(test_config=None):
 
         return response
 
-
     @app.route('/categories')
     def get_all_categories():
         """Get categories endpoint
 
-        This endpoint returns all categories or 
+        This endpoint returns all categories or
         status code 500 if there is a server error
         """
 
@@ -51,12 +51,11 @@ def create_app(test_config=None):
 
             # return successful response
             return jsonify({
-                'success' : True,
-                'categories' : categories_dict
+                'success': True,
+                'categories': categories_dict
             }), 200
         except Exception:
             abort(500)
-
 
     @app.route('/questions')
     def get_questions():
@@ -76,8 +75,8 @@ def create_app(test_config=None):
 
         # Get paginated questions
         current_questions = get_paginated_questions(
-                                request, questions, 
-                                QUESTIONS_PER_PAGE)
+            request, questions,
+            QUESTIONS_PER_PAGE)
 
         # return 404 if there are no questions for the page number
         if (len(current_questions) == 0):
@@ -95,12 +94,11 @@ def create_app(test_config=None):
             'questions': current_questions
         }), 200
 
-
     @app.route('/questions/<int:id>', methods=['DELETE'])
     def delete_question(id):
         """Delete specific question
 
-        This endpoint deletes a specific question by the 
+        This endpoint deletes a specific question by the
         id given as a url parameter
         """
         try:
@@ -114,11 +112,10 @@ def create_app(test_config=None):
         except Exception:
             abort(422)
 
-
     @app.route('/questions', methods=['POST'])
     def create_question():
         """This endpoint creates a question.
-        
+
         A 422 status code is returned if the any of
         the json data is empty.
         """
@@ -126,10 +123,10 @@ def create_app(test_config=None):
         data = request.get_json()
 
         # get individual data from json data
-        question = data.get('question','')
-        answer = data.get('answer','')
-        difficulty = data.get('difficulty','')
-        category = data.get('category','')
+        question = data.get('question', '')
+        answer = data.get('answer', '')
+        difficulty = data.get('difficulty', '')
+        category = data.get('category', '')
 
         # validate to ensure no data is empty
         if ((question == '') or (answer == '')
@@ -139,11 +136,11 @@ def create_app(test_config=None):
         try:
             # Create a new question instance
             question = Question(
-                question=question, 
+                question=question,
                 answer=answer,
-                difficulty=difficulty, 
+                difficulty=difficulty,
                 category=category)
-        
+
             # save question
             question.insert()
 
@@ -154,9 +151,8 @@ def create_app(test_config=None):
             }), 201
 
         except Exception:
-            # return 422 status code if error 
+            # return 422 status code if error
             abort(422)
-
 
     @app.route('/questions/search', methods=['POST'])
     def search_questions():
@@ -181,8 +177,8 @@ def create_app(test_config=None):
 
             # paginate questions
             paginated_questions = get_paginated_questions(
-                                request, questions, 
-                                QUESTIONS_PER_PAGE)
+                request, questions,
+                QUESTIONS_PER_PAGE)
 
             # return response if successful
             return jsonify({
@@ -195,7 +191,6 @@ def create_app(test_config=None):
             # This error code is returned when 404 abort
             # raises exception from try block
             abort(404)
-
 
     @app.route('/categories/<int:id>/questions')
     def get_questions_by_category(id):
@@ -212,8 +207,8 @@ def create_app(test_config=None):
 
         # paginate questions
         paginated_questions = get_paginated_questions(
-                            request, questions, 
-                            QUESTIONS_PER_PAGE)
+            request, questions,
+            QUESTIONS_PER_PAGE)
 
         # return the results
         return jsonify({
@@ -222,7 +217,6 @@ def create_app(test_config=None):
             'total_questions': len(questions),
             'current_category': category.type
         })
-
 
     @app.route('/quizzes', methods=['POST'])
     def play_quiz_question():
@@ -242,7 +236,8 @@ def create_app(test_config=None):
         if (quiz_category['id'] == 0):
             questions = Question.query.all()
         else:
-            questions = Question.query.filter_by(category=quiz_category['id']).all()
+            questions = Question.query.filter_by(
+                category=quiz_category['id']).all()
 
         # defines a random question generator method
         def get_random_question():
@@ -266,8 +261,8 @@ def create_app(test_config=None):
             'question': next_question.format(),
         }), 200
 
-
     # Error handler for Bad request error (400)
+
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({

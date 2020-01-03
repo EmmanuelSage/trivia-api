@@ -8,6 +8,7 @@ from models import setup_db, Question, Category
 
 from utils import create_mock_question
 
+
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
@@ -17,7 +18,7 @@ class TriviaTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.database_name = "trivia_test"
         self.database_path = "postgres://{}:{}@{}/{}".format(
-          'postgres', 'postgres', 'localhost:5432', self.database_name)
+            'postgres', 'postgres', 'localhost:5432', self.database_name)
 
         setup_db(self.app, self.database_path)
 
@@ -27,7 +28,7 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -49,7 +50,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['categories'])
         self.assertEqual(len(data['categories']), 6)
-    
+
     def test_get_paginated_questions(self):
         """Test for get all paginated questions
 
@@ -74,8 +75,8 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_error_for_out_of_bound_page(self):
         """Test for out of bound page
-       
-        This test ensures a page that is out of bound 
+
+        This test ensures a page that is out of bound
         returns a 404 error
         """
 
@@ -87,10 +88,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource not found')
-    
+
     def test_successful_question_delete(self):
         """Test for deleting a question.
-        
+
         create_mock_question function is used to prevent having
         to drop the database during the running of the test suite.
         """
@@ -99,10 +100,11 @@ class TriviaTestCase(unittest.TestCase):
         mock_question_id = create_mock_question()
 
         # delete mock question and process response
-        response = self.client().delete('/questions/{}'.format(mock_question_id))
+        response = self.client().delete(
+            '/questions/{}'.format(mock_question_id))
         data = json.loads(response.data)
 
-        # ensure question does not exist 
+        # ensure question does not exist
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['message'], "Question successfully deleted")
@@ -118,7 +120,8 @@ class TriviaTestCase(unittest.TestCase):
 
         # this tests if resource has already been deleted
         self.client().delete('/questions/{}'.format(mock_question_id))
-        response = self.client().delete('/questions/{}'.format(mock_question_id))
+        response = self.client().delete(
+            '/questions/{}'.format(mock_question_id))
         data = json.loads(response.data)
 
         # make assertions on the response data
@@ -126,11 +129,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Unprocessable entity')
 
-
     def test_delete_question_id_not_exist(self):
         """Tests deletion of question id that doesn't exist
 
-        This tests the error message returned a valid id that 
+        This tests the error message returned a valid id that
         doesn't exist is used.
         """
         # this tests an id that doesn't exist
@@ -154,8 +156,8 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_create_questions(self):
         """Test for creating question."""
-       
-       # mock data to use as payload for post request
+
+        # mock data to use as payload for post request
         mock_data = {
             'question': 'This is a mock question',
             'answer': 'this is a mock answer',
@@ -217,7 +219,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post('/questions/search', json=request_data)
         data = json.loads(response.data)
 
-         # Assertions
+        # Assertions
         self.assertEqual(response.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Unprocessable entity')
@@ -233,7 +235,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post('/questions/search', json=request_data)
         data = json.loads(response.data)
 
-         # Assertions
+        # Assertions
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource not found')
@@ -283,15 +285,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
-    
+
         # Ensures previous questions are not returned
         self.assertNotEqual(data['question']['id'], 5)
         self.assertNotEqual(data['question']['id'], 9)
 
         # Ensures returned question is in the correct category
         self.assertEqual(data['question']['category'], 4)
-
-
 
     def test_no_data_to_play_quiz(self):
         """Test for the case where no data is sent"""
